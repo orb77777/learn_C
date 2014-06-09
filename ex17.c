@@ -81,7 +81,7 @@ struct Connection* Database_open(char* filename, char action)
     
     if(!connection->file_stream)
     {
-        die("File opening error. \n");
+        die("File opening error. Check whether the file exists. \n");
     }
 
     return connection;
@@ -129,7 +129,7 @@ void Address_print(struct Address* address)
 
 void Database_get(struct Connection* connection, long id)
 {
-    struct Address* row = &connection->db->rows[id];
+     struct Address* row = &connection->db->rows[id];
 
     if(row->is_set)
     {
@@ -195,6 +195,8 @@ void Database_delete(struct Connection* connection, int id)
 void Database_list(struct Connection* connection)
 {
     int i = 0;
+
+    printf("The contents of the database are: \n");
     for(i = 0; i < MAX_ROWS; i++)
     {
         if(connection->db->rows[i].is_set)
@@ -203,6 +205,30 @@ void Database_list(struct Connection* connection)
             printf("\n");
         }
     }
+}
+
+void Database_close(struct Connection* connection)
+{
+    if(connection)
+    {
+        if(connection->db)
+        {
+            free(connection->db);
+        }
+
+        if(connection->file_stream)
+        {
+            int check = fclose(connection->file_stream);
+
+            if(check == EOF)
+            {
+                die("Error in closing file stream.");
+            }
+        }
+
+        free(connection);
+    }
+
 }
 
 int main(int argc, char* argv[])
