@@ -275,6 +275,7 @@ int main(int argc, char* argv[])
         if(*end)
         {
             printf("Conversion error, non-convertible part: %s \n", end);
+            die("exit");
         }
     }
 
