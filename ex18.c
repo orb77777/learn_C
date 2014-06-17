@@ -1,8 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
-typedef int (*compare)(int number1, int number2);
+/*
+ * Függvénypointer típus definiálása. Így könnyen adható át függvény paraméterben.
+ *
+ * A fgv. pointer minden olyan fgv.-re illeszkedik, aminek a szignatúrája (kivéve a nevét) megegyezik
+ * az övével. Jó, mert pl. ebben a programban is a bubble_sort fgv. megkaphat egy ilyen fgv. pointer típusú fgv.-t, és 
+ * az értékétől függően fog lefutni az adott típusú sorrendberakás. Előnyei:
+ * - olvashatóbb kód, nem kell flag-ekkel megkülönböztetni, és elágazásokkal a kül. módokat
+ * - magasabb absztrakciós szinten lehet megírni az adott fgv. kódját, az elágazó implementáció
+ *   külön fgv-ekben kezelhető, amiket a fgv. pointer fog össze.
+ * - összegyűjthetőek vele az azonos funkciójú függvények, mintha csak egy interface-t adna rájuk. 
+ * */
+typedef int (*cmp)(int number1, int number2);
 
 void die(const char* error_message)
 {
@@ -18,6 +30,84 @@ void die(const char* error_message)
     exit(1);
 
 }
+
+int* bubble_sort(int* numbers, int count, cmp compare)
+{
+    int i = 0;
+    int j = 0;
+    int temp = 0;
+    /*
+     * A második ciklussal elég csak i-vel kevesebb lépést megtenni, mert minden külső ciklus lépéssel
+     * egy elem biztos a helyére kerül.
+     * A -1 kell a második ciklusban, mert j+1 van, és így kiindexelnék.
+     * A külső ciklus csak egy számláló szerepet tölt be, hogy minden elem biztosan sorra kerüljön.
+     * */
+    for(i = 0; i < count; i++)
+        for(j = 0; j < count - i - 1; j++)
+        {
+            if(compare(numbers[j], numbers[j+1]) > 0)
+            {
+                temp = numbers[j];
+                numbers[j] = numbers[j+1];
+                numbers[j+1] = temp;
+            }
+        }
+
+   return numbers;
+
+
+}
+
+void sort(int* numbers, int count, cmp compare)
+{
+    int* copied_numbers = malloc(count * sizeof(int));
+    if(!copied_numbers)
+    {
+        die("Memory error (2).");
+    }
+    
+    /*
+     * void* memcpy(void* to, const void* from, size_t number_of_bytes) -> a visszatérési pointer a to-ra mutat.
+     * Vigyázni kell, hogy a to és a from ne lapolódjon át, különben bizonytalan a viselkedés.
+     * Átmásolja a from-ból a to által mutatott területre number_of_bytes mennyiségű adatot.
+     * Stringeknél a strcpy vagy a strncpy, más tömbtípusoknál ez használandó másoláskor.
+     * */
+    memcpy(copied_numbers, numbers, count * sizeof(int));
+
+    int* sorted_numbers = bubble_sort(copied_numbers, count, compare);
+
+    int i = 0;
+
+    for(i = 0; i < count; i++)
+    {
+        printf("%d ", sorted_numbers[i]);
+    }
+
+    printf("\n");
+
+    free(copied_numbers);
+}
+
+int sorted_order(int a, int b)
+{
+    return a - b;
+}
+
+int reversed_order(int a, int b)
+{
+    return b - a;
+}
+
+int strange_order(int a, int b)
+{
+    if(a == 0 || b == 0)
+    {
+        return 0;
+    }
+
+    return a % b;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -54,6 +144,11 @@ int main(int argc, char* argv[])
         }
     }
 
+    sort(numbers, count, sorted_order);
+    sort(numbers, count, reversed_order);
+    sort(numbers, count, strange_order);
+
+    free(numbers);
 
     return 0;
 }
