@@ -86,6 +86,17 @@ void sort(int* numbers, int count, cmp compare)
     printf("\n");
 
     free(copied_numbers);
+
+    //Érdekesség:  a fgv. pointer által mutatott területet stringként olvasom ki, majd hexában 
+    //kiíratom. Ezt aztán megnézhetem a futtatható fájlban, és meg lehet találni vele, hol kezdődik a függvény.
+    unsigned char* data = (unsigned char*) compare;
+
+    for(i = 0; i < 25; i++)
+    {
+        printf("%02x:", data[i]);
+    }
+
+    printf("\n");
 }
 
 int sorted_order(int a, int b)
