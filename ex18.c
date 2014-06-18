@@ -16,6 +16,11 @@
  * */
 typedef int (*cmp)(int number1, int number2);
 
+/*
+ * A rendezési algoritmusokra mutató fgv. pointer.
+ * */
+typedef int* (*srt)(int*, int, cmp);
+
 void die(const char* error_message)
 {
     if(errno)
@@ -58,14 +63,39 @@ int* bubble_sort(int* numbers, int count, cmp compare)
 
 }
 
-void sort(int* numbers, int count, cmp compare)
+int* insertion_sort(int* numbers, int count, cmp compare)
+{
+    int i = 0;
+    int j = 0;
+    int temp = 0;
+
+    for(i = 0; i < count; i++)
+        for(j = i; j > 0; j--)
+        {
+            if(compare(numbers[j-1], numbers[j]) > 0)
+            {
+                temp = numbers[j-1];
+                numbers[j-1] = numbers[j];
+                numbers[j] = temp;
+            }
+            // csak addig hasonlítgassunk visszafelé, a már rendezett tömbben, amíg már nem kell cserélni
+            // mert ha egyszer nem kell, akkor utána se kell, a rendezettség miatt.
+            else
+            {
+                break;
+            }
+        }
+
+    return numbers;
+}
+
+void test_sorting(int* numbers, int count, cmp compare, srt sort)
 {
     int* copied_numbers = malloc(count * sizeof(int));
     if(!copied_numbers)
     {
         die("Memory error (2).");
     }
-    
     /*
      * void* memcpy(void* to, const void* from, size_t number_of_bytes) -> a visszatérési pointer a to-ra mutat.
      * Vigyázni kell, hogy a to és a from ne lapolódjon át, különben bizonytalan a viselkedés.
@@ -74,7 +104,7 @@ void sort(int* numbers, int count, cmp compare)
      * */
     memcpy(copied_numbers, numbers, count * sizeof(int));
 
-    int* sorted_numbers = bubble_sort(copied_numbers, count, compare);
+    int* sorted_numbers = sort(copied_numbers, count, compare);
 
     int i = 0;
 
@@ -155,9 +185,11 @@ int main(int argc, char* argv[])
         }
     }
 
-    sort(numbers, count, sorted_order);
-    sort(numbers, count, reversed_order);
-    sort(numbers, count, strange_order);
+    test_sorting(numbers, count, sorted_order, bubble_sort);
+    test_sorting(numbers, count, reversed_order, insertion_sort);
+    test_sorting(numbers, count, strange_order, insertion_sort);
+
+
 
     free(numbers);
 
