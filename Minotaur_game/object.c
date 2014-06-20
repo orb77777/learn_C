@@ -16,7 +16,7 @@ void Object_destroy(void* self)
     {
         if(object->description)
         {
-            free(description);
+            free(object->description);
         }
 
         free(object);
@@ -35,14 +35,14 @@ int Object_attack(void* self, int damage)
     return 0;
 }
 
-void Object_describe(void* self);
+void Object_describe(void* self)
 {
     Object* object = self;
 
     printf("%s \n", object->description);
 }
 //Miért void*-ot adunk vissza, miért nem Object*-ot?
-void* Object_new(int size, Object proto, char* description)
+void* Object_new(size_t size, Object proto, char* description)
 {
 
     if(!proto.init) proto.init = Object_init;
