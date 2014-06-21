@@ -162,17 +162,29 @@ int process_input(Map* game)
 {
 
     int command = getchar();
-    //getchar();
 
-    //Az EOF az stdinről való beolvasásnál: Unix esetén CTRL+D, Windowsban CTRL+Z. A GNU C könyvtárban -1-es értéket jelöl.
+    //Az EOF az stdinről való beolvasásnál: Unix esetén CTRL+D, Windowsban CTRL+Z. A GNU C könyvtárban -1-es értéket jelöl, a
+    //többi implementácóban ez eltérhet.
+    //A while ciklus elé kellett tennem, mivel azt akartam, hogy CTRL+D megnyomása után
+    //ne kelljen még egy ENTER-t is ütni, hoyg érvényre jusson.
     if(command == EOF)
     {
         exit(2);
     }
+    
+    //Ezzel a ciklussal érem el, hogy a többi beírt karaktert figyelmen kívül hagyja.
+    // A getchar() visszatérési értéke alapból int, de a C a karaktereket úgyis
+    // számokká alakítja (ASCII kód), ezért ez a \n karakternél sem okoz gondot
+    // az összehasonlításban.És lejjebb a switch feltételeként sem.
+    while(getchar() != '\n')
+    {
+
+    }
+
 
     int damage = rand() % 4;
 
-    switch((char)command)
+    switch(command)
     {
         //HIBA a példakódban: a -1-et nem eszi meg a getchar(), mivel az 2 karakter, helyette EOF-ot kell használni!!
         case 'q':
