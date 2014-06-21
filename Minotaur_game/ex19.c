@@ -161,14 +161,20 @@ Object MapProto = {
 int process_input(Map* game)
 {
 
-    char command = getchar();
-    getchar();
+    int command = getchar();
+    //getchar();
+
+    //Az EOF az stdinről való beolvasásnál: Unix esetén CTRL+D, Windowsban CTRL+Z. A GNU C könyvtárban -1-es értéket jelöl.
+    if(command == EOF)
+    {
+        exit(2);
+    }
 
     int damage = rand() % 4;
 
-    switch(command)
+    switch((char)command)
     {
-        //HIBA a példakódban: a -1-et nem eszi meg a getchar()!!
+        //HIBA a példakódban: a -1-et nem eszi meg a getchar(), mivel az 2 karakter, helyette EOF-ot kell használni!!
         case 'q':
             printf("Giving up? Don't be coward! Try it again! \n");
             return 0;
