@@ -53,7 +53,7 @@ void* Object_new(size_t size, Object proto, char* description)
 
     Object* object = calloc(1, size);
     *object = proto;
-    
+
     object->description = strdup(description);
 
     if(!object->init(object))
