@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -DNDEBUG
 
 #számít a sorrend! az all target a default, ha nem ez van elöl, akkor nem működik a csak make kulcsszóra
 all:
